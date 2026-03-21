@@ -45,10 +45,10 @@ body{
   background-size:cover;
   background-position:center;
   transition: opacity 1s ease;
-  filter: brightness(0.3) blur(2px);
+  filter: brightness(0.35) blur(2px);
 }
 
-/* MENSAJES EN PANTALLA */
+/* 💌 MENSAJES TRANSPARENTES */
 #mensajesPantalla{
   position:fixed;
   top:20px;
@@ -58,16 +58,28 @@ body{
   display:flex;
   flex-direction:column;
   gap:10px;
+  pointer-events:none;
 }
+
 .mensaje-item{
-  background: rgba(168,85,247,0.8);
+  background: rgba(168,85,247,0.25);
+  backdrop-filter: blur(6px);
   padding:10px 20px;
   border-radius:15px;
-  animation: aparecerMensaje 1s ease;
+  color:white;
+  font-size:14px;
+  animation: aparecerMensaje 1s ease, desaparecerMensaje 8s forwards;
 }
+
 @keyframes aparecerMensaje{
   from{opacity:0; transform:translateY(-20px);}
   to{opacity:1; transform:translateY(0);}
+}
+
+@keyframes desaparecerMensaje{
+  0%{opacity:1;}
+  80%{opacity:1;}
+  100%{opacity:0;}
 }
 
 header{
@@ -162,7 +174,6 @@ button{
 </div>
 
 <div id="collage"></div>
-
 <div id="mensajesPantalla"></div>
 
 <audio id="musica" loop>
@@ -298,19 +309,20 @@ async function enviarMensaje(){
  cargarMensajes();
 }
 
-// cargar mensajes en pantalla
+// 💌 MENSAJES EN PANTALLA
 async function cargarMensajes(){
  let r = await fetch(API + "/mensajes");
  let data = await r.json();
 
  let cont = document.getElementById("mensajesPantalla");
- cont.innerHTML = "";
 
  data.slice(-5).forEach(m=>{
   let div = document.createElement("div");
   div.className = "mensaje-item";
   div.innerText = `${m.nombre}: ${m.mensaje}`;
   cont.appendChild(div);
+
+  setTimeout(()=>div.remove(),8000);
  });
 }
 setInterval(cargarMensajes,10000);
@@ -328,7 +340,7 @@ async function cargarVideos(){
  });
 }
 
-// collage mejorado
+// 📸 COLLAGE CORREGIDO
 let imagenes=[];
 let index=0;
 
@@ -351,8 +363,15 @@ function cambiarFondo(){
  collage.style.opacity=0;
 
  setTimeout(()=>{
-  collage.style.backgroundImage=`url(${API+imagenes[index]})`;
+  let img = imagenes[index];
+
+  let ruta = img.startsWith("/uploads")
+    ? API + img
+    : API + "/uploads/images/" + img;
+
+  collage.style.backgroundImage=`url('${ruta}')`;
   collage.style.opacity=1;
+
   index=(index+1)%imagenes.length;
  },500);
 }

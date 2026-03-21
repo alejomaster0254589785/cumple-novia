@@ -31,16 +31,18 @@ input,textarea{
   max-width:300px;
   background: rgba(255,255,255,0.08);
   color:#fff;
-  transition: all 0.25s ease;
   height:45px;
 }
 
 textarea{resize:none;}
 
-input:focus, textarea:focus{
-  outline:none;
-  background: rgba(255,255,255,0.12);
-  box-shadow:0 0 0 2px rgba(168,85,247,0.6),0 0 15px rgba(168,85,247,0.4);
+/* FILA */
+.fila{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
 }
 
 /* BOTON */
@@ -52,15 +54,6 @@ button{
   border:none;
   border-radius:10px;
   cursor:pointer;
-}
-
-/* FILA */
-.fila{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
 }
 
 /* VIDEOS */
@@ -79,6 +72,17 @@ button{
   background:#a855f7;
   padding:15px 20px;
   border-radius:15px;
+}
+
+/* CARTA */
+.oculto{display:none;}
+
+.carta{
+  margin-top:20px;
+  padding:20px;
+  background:rgba(255,255,255,0.1);
+  border-radius:15px;
+  text-align:left;
 }
 </style>
 </head>
@@ -134,6 +138,51 @@ button{
 <div class="card">
 <h3>🎥 Videos</h3>
 <div id="videos"></div>
+</div>
+</div>
+
+<!-- 💌 CARTA -->
+<div class="section">
+<div class="card">
+<h3>💌 Para ti</h3>
+<button onclick="abrirCarta()">Ábreme 💜</button>
+
+<div id="carta" class="carta oculto">
+<p id="textoCarta"></p>
+</div>
+</div>
+</div>
+
+<!-- 🔐 SECRETO -->
+<div class="section">
+<div class="card">
+<h3>🔐 Sección Secreta</h3>
+<button onclick="mostrarSecreto()">Entrar 💜</button>
+
+<div id="secreto" class="oculto">
+<h4>Solo para ti 💜</h4>
+
+<video controls width="300">
+<source src="video.mp4">
+</video>
+
+<video controls width="300">
+<source src="cancion.mp4">
+</video>
+
+</div>
+</div>
+</div>
+
+<!-- 🎁 SORPRESA -->
+<div class="section">
+<div class="card">
+<h3>🎁 Sorpresa</h3>
+<button onclick="mostrarSorpresa()">Descubrir 💜</button>
+
+<div id="sorpresa" class="oculto">
+<h2>💆‍♀️ Bono SPA juntos 💜</h2>
+</div>
 </div>
 </div>
 
@@ -200,7 +249,7 @@ async function enviarMensaje(){
  mostrarMensaje("💌 Mensaje enviado");
 }
 
-// CARGAR VIDEOS
+// VIDEOS
 async function cargarVideos(){
  let r=await fetch(API+"/videos");
  let data=await r.json();
@@ -214,7 +263,38 @@ async function cargarVideos(){
 }
 
 cargarVideos();
+
+// 💌 CARTA
+const mensajeCarta = "Desde el momento en que te vi, supe que eras especial... 💜 Gracias por existir.";
+
+function abrirCarta(){
+ carta.classList.remove("oculto");
+ escribirTexto(mensajeCarta, textoCarta);
+}
+
+function escribirTexto(texto, elemento){
+ elemento.innerHTML="";
+ let i=0;
+ let t=setInterval(()=>{
+  elemento.innerHTML+=texto[i];
+  i++;
+  if(i>=texto.length) clearInterval(t);
+ },40);
+}
+
+// 🔐 SECRETO
+function mostrarSecreto(){
+ secreto.classList.toggle("oculto");
+}
+
+// 🎁 SORPRESA
+function mostrarSorpresa(){
+ sorpresa.classList.remove("oculto");
+}
 </script>
+
+</body>
+</html>
 
 </body>
 </html>

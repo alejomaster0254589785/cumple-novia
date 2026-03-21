@@ -16,7 +16,7 @@ body {margin:0;font-family:'Poppins';background:#140a22;color:white;}
   display:flex; justify-content:center; align-items:center;
   z-index:9999; animation: fadeOut 4s forwards;
 }
-.intro-text{color:white;font-size:2rem;opacity:0;animation: aparecerTexto 3s forwards;}
+.intro-text{font-size:2rem;opacity:0;animation: aparecerTexto 3s forwards;}
 @keyframes aparecerTexto{to{opacity:1;}}
 @keyframes fadeOut{0%,80%{opacity:1;}100%{opacity:0;visibility:hidden;}}
 
@@ -62,6 +62,27 @@ input,textarea{
 }
 textarea{resize:none;}
 
+/* BOTONES UPLOAD */
+.upload-box{
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  flex-wrap:wrap;
+}
+
+.upload-btn{
+  background:#a855f7;
+  padding:12px 25px;
+  border-radius:12px;
+  cursor:pointer;
+  transition:0.3s;
+  font-weight:bold;
+}
+.upload-btn:hover{
+  transform:scale(1.05);
+  box-shadow:0 0 15px rgba(168,85,247,0.7);
+}
+
 /* FILA */
 .fila{
   display:flex;
@@ -71,7 +92,6 @@ textarea{resize:none;}
   flex-wrap:wrap;
 }
 
-/* BOTON */
 button{
   height:45px;
   padding:0 20px;
@@ -80,11 +100,6 @@ button{
   border:none;
   border-radius:10px;
   cursor:pointer;
-  transition:0.3s;
-}
-button:hover{
-  transform:scale(1.05);
-  box-shadow:0 0 10px rgba(168,85,247,0.6);
 }
 
 /* VIDEOS */
@@ -105,42 +120,18 @@ button:hover{
   border-radius:15px;
 }
 
-/* CARTA */
 .oculto{display:none;}
-.carta{
-  margin-top:20px;
-  padding:20px;
-  background:rgba(255,255,255,0.1);
-  border-radius:15px;
-  text-align:left;
-}
-
-/* 🎁 SORPRESA */
-.sorpresa-box{
-  animation: aparecerSorpresa 1s ease;
-  background: rgba(168,85,247,0.2);
-  padding:30px;
-  border-radius:20px;
-  box-shadow:0 0 30px rgba(168,85,247,0.6);
-}
-@keyframes aparecerSorpresa{
-  from{transform:scale(0.5); opacity:0;}
-  to{transform:scale(1); opacity:1;}
-}
 </style>
 </head>
 
 <body>
 
-<!-- 🎬 INTRO -->
 <div id="intro">
   <div class="intro-text">Una historia… 💜</div>
 </div>
 
-<!-- 📸 COLLAGE -->
 <div id="collage"></div>
 
-<!-- 🎵 MÚSICA -->
 <audio id="musica" loop>
   <source src="musica.mp3">
 </audio>
@@ -153,11 +144,20 @@ button:hover{
 <!-- 🎥 UPLOAD -->
 <div class="section">
 <div class="card">
-<h3>🎥 Subir video</h3>
-<input type="file" id="videoUpload">
+<h3>Sube tus recuerdos 💜</h3>
 
-<h3>📸 Subir foto</h3>
-<input type="file" id="imageUpload">
+<div class="upload-box">
+  <label class="upload-btn">
+    🎥 Subir video
+    <input type="file" id="videoUpload" hidden>
+  </label>
+
+  <label class="upload-btn">
+    📸 Subir foto
+    <input type="file" id="imageUpload" hidden>
+  </label>
+</div>
+
 </div>
 </div>
 
@@ -193,55 +193,10 @@ button:hover{
 </div>
 </div>
 
-<!-- 💌 CARTA -->
-<div class="section">
-<div class="card">
-<h3>💌 Para ti</h3>
-<button onclick="abrirCarta()">Ábreme 💜</button>
-
-<div id="carta" class="carta oculto">
-<p id="textoCarta"></p>
-</div>
-</div>
-</div>
-
-<!-- 🔐 SECRETO -->
-<div class="section">
-<div class="card">
-<h3>🔐 Sección Secreta</h3>
-<button onclick="mostrarSecreto()">Entrar 💜</button>
-
-<div id="secreto" class="oculto">
-<h4>Solo para ti 💜</h4>
-
-<video controls width="300">
-<source src="video.mp4">
-</video>
-
-<video controls width="300">
-<source src="cancion.mp4">
-</video>
-
-</div>
-</div>
-</div>
-
-<!-- 🎁 SORPRESA -->
-<div class="section">
-<div class="card">
-<h3>🎁 Sorpresa</h3>
-<button onclick="mostrarSorpresa()">Descubrir 💜</button>
-
-<div id="sorpresa" class="oculto sorpresa-box">
-<h2>💆‍♀️ Bono SPA juntos 💜</h2>
-</div>
-</div>
-</div>
-
 <script>
-const API = "https://TU-BACKEND.onrender.com";
+const API = "https://cumple-backend-lpdv.onrender.com";
 
-// 🎵 música
+// música
 document.body.addEventListener("click", ()=>{
  document.getElementById("musica").play();
 },{once:true});
@@ -263,25 +218,29 @@ function mostrarMensaje(texto){
  setTimeout(()=>div.remove(),3000);
 }
 
-// subir video
-videoUpload.onchange=async e=>{
+// 🎥 VIDEO
+document.getElementById("videoUpload").onchange = async (e)=>{
  let f=new FormData();
  f.append("file",e.target.files[0]);
+
  await fetch(API+"/upload-video",{method:"POST",body:f});
+
  mostrarMensaje("🎥 Video subido");
  cargarVideos();
 };
 
-// subir imagen
-imageUpload.onchange=async e=>{
+// 📸 IMAGEN
+document.getElementById("imageUpload").onchange = async (e)=>{
  let f=new FormData();
  f.append("file",e.target.files[0]);
+
  await fetch(API+"/upload-image",{method:"POST",body:f});
+
  mostrarMensaje("📸 Imagen subida");
  cargarCollage();
 };
 
-// confirmar
+// 📩 CONFIRMAR
 async function confirmar(){
  await fetch(API+"/confirmar",{
   method:"POST",
@@ -294,7 +253,7 @@ async function confirmar(){
  mostrarMensaje("💜 Confirmado");
 }
 
-// mensaje
+// 💌 MENSAJE
 async function enviarMensaje(){
  await fetch(API+"/mensaje",{
   method:"POST",
@@ -307,7 +266,7 @@ async function enviarMensaje(){
  mostrarMensaje("💌 Mensaje enviado");
 }
 
-// videos
+// 🎥 CARGAR VIDEOS
 async function cargarVideos(){
  let r=await fetch(API+"/videos");
  let data=await r.json();
@@ -320,7 +279,7 @@ async function cargarVideos(){
  });
 }
 
-// collage
+// 📸 COLLAGE
 async function cargarCollage(){
  let r=await fetch(API+"/images");
  let data=await r.json();
@@ -338,39 +297,7 @@ async function cargarCollage(){
 
 cargarVideos();
 cargarCollage();
-
-// carta
-const mensajeCarta="Desde el momento en que te vi supe que eras tú... 💜";
-
-function abrirCarta(){
- document.body.style.background="rgba(0,0,0,0.9)";
- carta.classList.remove("oculto");
- escribirTexto(mensajeCarta, textoCarta);
-}
-
-function escribirTexto(texto, elemento){
- elemento.innerHTML="";
- let i=0;
- let t=setInterval(()=>{
-  elemento.innerHTML+=texto[i];
-  i++;
-  if(i>=texto.length) clearInterval(t);
- },40);
-}
-
-// secreto
-function mostrarSecreto(){
- secreto.classList.toggle("oculto");
-}
-
-// sorpresa
-function mostrarSorpresa(){
- sorpresa.classList.remove("oculto");
-}
 </script>
-
-</body>
-</html>
 
 </body>
 </html>

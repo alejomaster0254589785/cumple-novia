@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cumpleaños 💜</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins&family=Great+Vibes&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin:0;
+  font-family:'Poppins';
+  background:#140a22;
+  color:white;
+}
+
+.bg-collage {
+  position:fixed;
+  inset:0;
+  z-index:-1;
+}
+
+.bg-collage img{
+  position:absolute;
+  width:200px;
+  opacity:0.2;
+  animation: float 20s linear infinite;
+}
+
+@keyframes float {
+  0%{transform:translateY(100vh);}
+  100%{transform:translateY(-120vh);}
+}
+
+header{text-align:center;padding:50px;}
+h1{font-family:'Great Vibes';font-size:3rem;}
+
+.section{padding:30px;text-align:center;}
+
+.card{
+  background:rgba(255,255,255,0.05);
+  padding:20px;
+  border-radius:20px;
+}
+
+input,textarea{
+  padding:10px;
+  margin:5px;
+  border-radius:10px;
+  border:none;
+}
+
+button{
+  padding:10px;
+  background:#a855f7;
+  color:white;
+  border:none;
+  border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg-collage" id="collage"></div>
+
+<header>
+<h1>Feliz Cumpleaños 💜</h1>
+<div id="contador"></div>
+</header>
+
+<div class="section">
+<div class="card">
+
+<h3>🎥 Subir video</h3>
+<input type="file" id="videoUpload">
+
+<h3>📸 Subir foto</h3>
+<input type="file" id="imageUpload">
+
+</div>
+</div>
+
+<div class="section">
+<div class="card">
+
+<h3>💌 Mensaje</h3>
+<input id="nombreMsg" placeholder="Nombre">
+<textarea id="mensaje"></textarea>
+<button onclick="enviarMensaje()">Enviar</button>
+
+</div>
+</div>
+
+<div class="section">
+<div class="card">
+
+<h3>📩 Confirmar</h3>
+<input id="nombre" placeholder="Nombre">
+<input id="correo" placeholder="Correo">
+<button onclick="confirmar()">Confirmar</button>
+
+</div>
+</div>
+
+<script>
+const API = "https://TU-BACKEND.onrender.com"; // LO CAMBIAREMOS LUEGO
+
+// contador
+const fecha = new Date("2026-03-30");
+setInterval(()=>{
+ let d=fecha-new Date();
+ let dias=Math.floor(d/(1000*60*60*24));
+ document.getElementById("contador").innerText=`Faltan ${dias} días 💜`;
+},1000);
+
+// confirmar
+async function confirmar(){
+ await fetch(API+"/confirmar",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({
+    nombre:nombre.value,
+    correo:correo.value
+  })
+ });
+ alert("Confirmado 💜");
+}
+
+// mensaje
+async function enviarMensaje(){
+ await fetch(API+"/mensaje",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({
+    nombre:nombreMsg.value,
+    mensaje:mensaje.value
+  })
+ });
+ alert("Mensaje enviado 💜");
+}
+</script>
+
+</body>
+</html>

@@ -8,43 +8,62 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins&family=Great+Vibes&display=swap" rel="stylesheet">
 
 <style>
-body {margin:0;font-family:'Poppins';background:#140a22;color:white;}
+body {
+  margin:0;
+  font-family:'Poppins';
+  background:#140a22;
+  color:white;
+}
 
 /* 🎬 INTRO */
 #intro{
-  position:fixed; inset:0; background:black;
-  display:flex; justify-content:center; align-items:center;
-  z-index:9999; animation: fadeOut 4s forwards;
+  position:fixed;
+  inset:0;
+  background:black;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+  animation: fadeOut 4s forwards;
 }
-.intro-text{font-size:2rem;opacity:0;animation: aparecerTexto 3s forwards;}
+.intro-text{
+  font-size:2rem;
+  opacity:0;
+  animation: aparecerTexto 3s forwards;
+}
 @keyframes aparecerTexto{to{opacity:1;}}
-@keyframes fadeOut{0%,80%{opacity:1;}100%{opacity:0;visibility:hidden;}}
+@keyframes fadeOut{
+  0%,80%{opacity:1;}
+  100%{opacity:0;visibility:hidden;}
+}
 
-/* 📸 COLLAGE */
+/* 📸 COLLAGE ESTÁTICO */
 #collage{
   position:fixed;
   inset:0;
   z-index:-1;
   background-size:cover;
   background-position:center;
-  transition: background-image 2s ease-in-out;
+  transition: opacity 1s ease, background-image 2s ease;
   filter: brightness(0.3) blur(2px);
-}
-#collage img{
-  position:absolute;
-  width:180px;
-  opacity:0.15;
-  animation: flotar linear infinite;
-}
-@keyframes flotar{
-  0%{transform:translateY(100vh);}
-  100%{transform:translateY(-120vh);}
+  opacity:1;
 }
 
-header{text-align:center;padding:50px;}
-h1{font-family:'Great Vibes';font-size:3rem;}
+header{
+  text-align:center;
+  padding:50px;
+}
 
-.section{padding:30px;text-align:center;}
+h1{
+  font-family:'Great Vibes';
+  font-size:3rem;
+}
+
+.section{
+  padding:30px;
+  text-align:center;
+}
+
 .card{
   background:rgba(255,255,255,0.05);
   padding:20px;
@@ -129,12 +148,15 @@ button{
 
 <body>
 
+<!-- 🎬 INTRO -->
 <div id="intro">
   <div class="intro-text">Una historia… 💜</div>
 </div>
 
+<!-- 📸 COLLAGE -->
 <div id="collage"></div>
 
+<!-- 🎵 MÚSICA -->
 <audio id="musica" loop>
   <source src="musica.mp3">
 </audio>
@@ -199,12 +221,12 @@ button{
 <script>
 const API = "https://cumple-backend-lpdv.onrender.com";
 
-// música
+// 🎵 música
 document.body.addEventListener("click", ()=>{
  document.getElementById("musica").play();
 },{once:true});
 
-// contador
+// ⏳ contador
 const fecha = new Date("2026-03-30");
 setInterval(()=>{
  let d=fecha-new Date();
@@ -212,7 +234,7 @@ setInterval(()=>{
  contador.innerText=`Faltan ${dias} días 💜`;
 },1000);
 
-// mensaje flotante
+// 💬 mensaje flotante
 function mostrarMensaje(texto){
  const div=document.createElement("div");
  div.className="mensaje-flotante";
@@ -222,7 +244,7 @@ function mostrarMensaje(texto){
 }
 
 // 🎥 VIDEO
-document.getElementById("videoUpload").onchange = async (e)=>{
+videoUpload.onchange = async e=>{
  let f=new FormData();
  f.append("file",e.target.files[0]);
 
@@ -233,7 +255,7 @@ document.getElementById("videoUpload").onchange = async (e)=>{
 };
 
 // 📸 IMAGEN
-document.getElementById("imageUpload").onchange = async (e)=>{
+imageUpload.onchange = async e=>{
  let f=new FormData();
  f.append("file",e.target.files[0]);
 
@@ -269,7 +291,7 @@ async function enviarMensaje(){
  mostrarMensaje("💌 Mensaje enviado");
 }
 
-// 🎥 CARGAR VIDEOS
+// 🎥 VIDEOS
 async function cargarVideos(){
  let r=await fetch(API+"/videos");
  let data=await r.json();
@@ -282,25 +304,36 @@ async function cargarVideos(){
  });
 }
 
-// 📸 COLLAGE
+// 📸 COLLAGE SLIDESHOW
+let imagenes = [];
+let index = 0;
+
 async function cargarCollage(){
- let r=await fetch(API+"/images");
- let data=await r.json();
+ let r = await fetch(API + "/images");
+ imagenes = await r.json();
 
- collage.innerHTML="";
+ if(imagenes.length > 0){
+  cambiarFondo();
+  setInterval(cambiarFondo, 5000);
+ }
+}
 
- data.forEach(img=>{
-  let el=document.createElement("img");
-  el.src=API+img;
-  el.style.left=Math.random()*100+"%";
-  el.style.animationDuration=(15+Math.random()*10)+"s";
-  collage.appendChild(el);
- });
+function cambiarFondo(){
+ collage.style.opacity = 0;
+
+ setTimeout(()=>{
+  collage.style.backgroundImage = `url(${API + imagenes[index]})`;
+  collage.style.opacity = 1;
+  index = (index + 1) % imagenes.length;
+ },500);
 }
 
 cargarVideos();
 cargarCollage();
 </script>
+
+</body>
+</html>
 
 </body>
 </html>

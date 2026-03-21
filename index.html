@@ -8,14 +8,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins&family=Great+Vibes&display=swap" rel="stylesheet">
 
 <style>
-body {
+body{
   margin:0;
   font-family:'Poppins';
   background:#140a22;
   color:white;
 }
 
-/* 🎬 INTRO */
+/* INTRO */
 #intro{
   position:fixed;
   inset:0;
@@ -37,23 +37,43 @@ body {
   100%{opacity:0;visibility:hidden;}
 }
 
-/* 📸 COLLAGE ESTÁTICO */
+/* COLLAGE */
 #collage{
   position:fixed;
   inset:0;
   z-index:-1;
   background-size:cover;
   background-position:center;
-  transition: opacity 1s ease, background-image 2s ease;
+  transition: opacity 1s ease;
   filter: brightness(0.3) blur(2px);
-  opacity:1;
+}
+
+/* MENSAJES EN PANTALLA */
+#mensajesPantalla{
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:10;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.mensaje-item{
+  background: rgba(168,85,247,0.8);
+  padding:10px 20px;
+  border-radius:15px;
+  animation: aparecerMensaje 1s ease;
+}
+@keyframes aparecerMensaje{
+  from{opacity:0; transform:translateY(-20px);}
+  to{opacity:1; transform:translateY(0);}
 }
 
 header{
   text-align:center;
   padding:50px;
 }
-
 h1{
   font-family:'Great Vibes';
   font-size:3rem;
@@ -84,32 +104,24 @@ input,textarea{
 }
 textarea{resize:none;}
 
-/* BOTONES UPLOAD */
+/* UPLOAD */
 .upload-box{
   display:flex;
   justify-content:center;
   gap:20px;
   flex-wrap:wrap;
 }
-
 .upload-btn{
   background:#a855f7;
   padding:12px 25px;
   border-radius:12px;
   cursor:pointer;
-  transition:0.3s;
-  font-weight:bold;
-}
-.upload-btn:hover{
-  transform:scale(1.05);
-  box-shadow:0 0 15px rgba(168,85,247,0.7);
 }
 
 /* FILA */
 .fila{
   display:flex;
   justify-content:center;
-  align-items:center;
   gap:10px;
   flex-wrap:wrap;
 }
@@ -118,10 +130,9 @@ button{
   height:45px;
   padding:0 20px;
   background:#a855f7;
-  color:white;
   border:none;
   border-radius:10px;
-  cursor:pointer;
+  color:white;
 }
 
 /* VIDEOS */
@@ -138,25 +149,22 @@ button{
   bottom:20px;
   right:20px;
   background:#a855f7;
-  padding:15px 20px;
+  padding:15px;
   border-radius:15px;
 }
-
-.oculto{display:none;}
 </style>
 </head>
 
 <body>
 
-<!-- 🎬 INTRO -->
 <div id="intro">
   <div class="intro-text">Una historia… 💜</div>
 </div>
 
-<!-- 📸 COLLAGE -->
 <div id="collage"></div>
 
-<!-- 🎵 MÚSICA -->
+<div id="mensajesPantalla"></div>
+
 <audio id="musica" loop>
   <source src="musica.mp3">
 </audio>
@@ -166,27 +174,27 @@ button{
 <div id="contador"></div>
 </header>
 
-<!-- 🎥 UPLOAD -->
+<!-- UPLOAD -->
 <div class="section">
 <div class="card">
 <h3>Sube tus recuerdos 💜</h3>
 
 <div class="upload-box">
-  <label class="upload-btn">
-    🎥 Subir video
-    <input type="file" id="videoUpload" hidden>
-  </label>
+<label class="upload-btn">
+🎥 Subir video
+<input type="file" id="videoUpload" hidden>
+</label>
 
-  <label class="upload-btn">
-    📸 Subir foto
-    <input type="file" id="imageUpload" hidden>
-  </label>
+<label class="upload-btn">
+📸 Subir foto
+<input type="file" id="imageUpload" hidden>
+</label>
 </div>
 
 </div>
 </div>
 
-<!-- 💌 MENSAJE -->
+<!-- MENSAJE -->
 <div class="section">
 <div class="card">
 <h3>💌 Mensaje</h3>
@@ -198,7 +206,7 @@ button{
 </div>
 </div>
 
-<!-- 📩 CONFIRMAR -->
+<!-- CONFIRMAR -->
 <div class="section">
 <div class="card">
 <h3>📩 Confirmar asistencia</h3>
@@ -210,7 +218,7 @@ button{
 </div>
 </div>
 
-<!-- 🎥 VIDEOS -->
+<!-- VIDEOS -->
 <div class="section">
 <div class="card">
 <h3>🎥 Videos</h3>
@@ -221,12 +229,12 @@ button{
 <script>
 const API = "https://cumple-backend-lpdv.onrender.com";
 
-// 🎵 música
+// música
 document.body.addEventListener("click", ()=>{
  document.getElementById("musica").play();
 },{once:true});
 
-// ⏳ contador
+// contador
 const fecha = new Date("2026-03-30");
 setInterval(()=>{
  let d=fecha-new Date();
@@ -234,38 +242,36 @@ setInterval(()=>{
  contador.innerText=`Faltan ${dias} días 💜`;
 },1000);
 
-// 💬 mensaje flotante
+// mensaje flotante
 function mostrarMensaje(texto){
- const div=document.createElement("div");
+ let div=document.createElement("div");
  div.className="mensaje-flotante";
  div.innerText=texto;
  document.body.appendChild(div);
  setTimeout(()=>div.remove(),3000);
 }
 
-// 🎥 VIDEO
-videoUpload.onchange = async e=>{
+// subir video
+videoUpload.onchange=async e=>{
  let f=new FormData();
  f.append("file",e.target.files[0]);
 
  await fetch(API+"/upload-video",{method:"POST",body:f});
-
  mostrarMensaje("🎥 Video subido");
  cargarVideos();
 };
 
-// 📸 IMAGEN
-imageUpload.onchange = async e=>{
+// subir imagen
+imageUpload.onchange=async e=>{
  let f=new FormData();
  f.append("file",e.target.files[0]);
 
  await fetch(API+"/upload-image",{method:"POST",body:f});
-
  mostrarMensaje("📸 Imagen subida");
  cargarCollage();
 };
 
-// 📩 CONFIRMAR
+// confirmar
 async function confirmar(){
  await fetch(API+"/confirmar",{
   method:"POST",
@@ -278,7 +284,7 @@ async function confirmar(){
  mostrarMensaje("💜 Confirmado");
 }
 
-// 💌 MENSAJE
+// mensaje
 async function enviarMensaje(){
  await fetch(API+"/mensaje",{
   method:"POST",
@@ -289,9 +295,27 @@ async function enviarMensaje(){
   })
  });
  mostrarMensaje("💌 Mensaje enviado");
+ cargarMensajes();
 }
 
-// 🎥 VIDEOS
+// cargar mensajes en pantalla
+async function cargarMensajes(){
+ let r = await fetch(API + "/mensajes");
+ let data = await r.json();
+
+ let cont = document.getElementById("mensajesPantalla");
+ cont.innerHTML = "";
+
+ data.slice(-5).forEach(m=>{
+  let div = document.createElement("div");
+  div.className = "mensaje-item";
+  div.innerText = `${m.nombre}: ${m.mensaje}`;
+  cont.appendChild(div);
+ });
+}
+setInterval(cargarMensajes,10000);
+
+// videos
 async function cargarVideos(){
  let r=await fetch(API+"/videos");
  let data=await r.json();
@@ -304,36 +328,39 @@ async function cargarVideos(){
  });
 }
 
-// 📸 COLLAGE SLIDESHOW
-let imagenes = [];
-let index = 0;
+// collage mejorado
+let imagenes=[];
+let index=0;
 
 async function cargarCollage(){
  let r = await fetch(API + "/images");
- imagenes = await r.json();
+ let todas = await r.json();
+
+ let mejores = todas.filter(img => img.includes("best"));
+ let normales = todas.filter(img => !img.includes("best"));
+
+ imagenes = [...mejores, ...normales];
 
  if(imagenes.length > 0){
   cambiarFondo();
-  setInterval(cambiarFondo, 5000);
+  setInterval(cambiarFondo,5000);
  }
 }
 
 function cambiarFondo(){
- collage.style.opacity = 0;
+ collage.style.opacity=0;
 
  setTimeout(()=>{
-  collage.style.backgroundImage = `url(${API + imagenes[index]})`;
-  collage.style.opacity = 1;
-  index = (index + 1) % imagenes.length;
+  collage.style.backgroundImage=`url(${API+imagenes[index]})`;
+  collage.style.opacity=1;
+  index=(index+1)%imagenes.length;
  },500);
 }
 
 cargarVideos();
 cargarCollage();
+cargarMensajes();
 </script>
-
-</body>
-</html>
 
 </body>
 </html>

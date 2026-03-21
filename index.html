@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cumpleaños Carito 💜</title>
+  <title>Cumpleaños 💜</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&family=Great+Vibes&display=swap" rel="stylesheet">
 
@@ -38,10 +38,21 @@
   width:80%;
   max-width:350px;
   box-sizing:border-box;
+  background: rgba(255,255,255,0.08);
+  color:#fff;
+  transition: all 0.25s ease;
 }
 
 textarea{
   height:40px;
+}
+
+/* ✨ EFECTO FOCUS */
+input:focus, textarea:focus{
+  outline: none;
+  background: rgba(255,255,255,0.12);
+  box-shadow: 0 0 0 2px rgba(168,85,247,0.6), 0 0 15px rgba(168,85,247,0.4);
+  transform: scale(1.02);
 } 
     textarea{height:100px;resize:none;} 
 
@@ -60,7 +71,7 @@ textarea{
 <div class="bg-collage" id="collage"></div>
 
 <header>
-  <h1>Feliz Cumpleaños Carito 💜</h1>
+  <h1>Feliz Cumpleaños Mi Amor 💜</h1>
   <div class="contador" id="contador"></div>
 </header>
 
@@ -193,4 +204,5 @@ cargarCollage();
 
 </body>
 </html>
+
 

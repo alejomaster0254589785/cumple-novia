@@ -32,32 +32,15 @@ input,textarea{
   background: rgba(255,255,255,0.08);
   color:#fff;
   transition: all 0.25s ease;
-  height:45px; /* 🔥 MISMO TAMAÑO */
-  box-sizing:border-box;
+  height:45px;
 }
 
-textarea{
-  resize:none; /* 🔥 evita que cambie tamaño */
-}
+textarea{resize:none;}
 
-/* FOCUS */
 input:focus, textarea:focus{
   outline:none;
   background: rgba(255,255,255,0.12);
   box-shadow:0 0 0 2px rgba(168,85,247,0.6),0 0 15px rgba(168,85,247,0.4);
-  transform:scale(1.02);
-}
-
-/* PLACEHOLDER */
-input::placeholder, textarea::placeholder{
-  color:#c084fc;
-  transition: all 0.3s ease;
-}
-
-input:focus::placeholder, textarea:focus::placeholder{
-  transform: translateY(-8px);
-  opacity:0.6;
-  font-size:12px;
 }
 
 /* BOTON */
@@ -69,21 +52,23 @@ button{
   border:none;
   border-radius:10px;
   cursor:pointer;
-  transition:0.3s;
 }
 
-button:hover{
-  transform:scale(1.05);
-  box-shadow:0 0 10px rgba(168,85,247,0.6);
-}
-
-/* FILA MENSAJE */
-.fila-mensaje{
+/* FILA */
+.fila{
   display:flex;
   justify-content:center;
   align-items:center;
   gap:10px;
   flex-wrap:wrap;
+}
+
+/* VIDEOS */
+#videos video{
+  width:100%;
+  max-width:300px;
+  margin:10px;
+  border-radius:10px;
 }
 
 /* MENSAJE FLOTANTE */
@@ -94,16 +79,6 @@ button:hover{
   background:#a855f7;
   padding:15px 20px;
   border-radius:15px;
-  animation: aparecer 0.5s ease, desaparecer 0.5s ease 3s forwards;
-}
-
-@keyframes aparecer{
-  from{opacity:0; transform:translateY(20px);}
-  to{opacity:1; transform:translateY(0);}
-}
-
-@keyframes desaparecer{
-  to{opacity:0; transform:translateY(20px);}
 }
 </style>
 </head>
@@ -115,24 +90,57 @@ button:hover{
 <div id="contador"></div>
 </header>
 
+<!-- 🎥 UPLOAD -->
 <div class="section">
 <div class="card">
+<h3>🎥 Subir video</h3>
+<input type="file" id="videoUpload">
 
-<h3>💌 Mensaje</h3>
-
-<div class="fila-mensaje">
-  <input id="nombreMsg" placeholder="Tu nombre">
-  <textarea id="mensaje" placeholder="Escribe algo bonito..."></textarea>
-  <button onclick="enviarMensaje()">Enviar</button>
+<h3>📸 Subir foto</h3>
+<input type="file" id="imageUpload">
+</div>
 </div>
 
+<!-- 💌 MENSAJE -->
+<div class="section">
+<div class="card">
+<h3>💌 Mensaje</h3>
+
+<div class="fila">
+<input id="nombreMsg" placeholder="Tu nombre">
+<textarea id="mensaje" placeholder="Escribe algo bonito..."></textarea>
+<button onclick="enviarMensaje()">Enviar</button>
+</div>
+
+</div>
+</div>
+
+<!-- 📩 CONFIRMAR -->
+<div class="section">
+<div class="card">
+<h3>📩 Confirmar asistencia</h3>
+
+<div class="fila">
+<input id="nombre" placeholder="Tu nombre">
+<input id="correo" placeholder="Tu correo">
+<button onclick="confirmar()">Confirmar</button>
+</div>
+
+</div>
+</div>
+
+<!-- 🎥 VIDEOS -->
+<div class="section">
+<div class="card">
+<h3>🎥 Videos</h3>
+<div id="videos"></div>
 </div>
 </div>
 
 <script>
 const API = "https://TU-BACKEND.onrender.com";
 
-// contador
+// CONTADOR
 const fecha = new Date("2026-03-30");
 setInterval(()=>{
  let d=fecha-new Date();
@@ -140,16 +148,46 @@ setInterval(()=>{
  document.getElementById("contador").innerText=`Faltan ${dias} días 💜`;
 },1000);
 
-// mensaje flotante
+// MENSAJE FLOTANTE
 function mostrarMensaje(texto){
  const div=document.createElement("div");
  div.className="mensaje-flotante";
  div.innerText=texto;
  document.body.appendChild(div);
- setTimeout(()=>div.remove(),4000);
+ setTimeout(()=>div.remove(),3000);
 }
 
-// enviar mensaje
+// SUBIR VIDEO
+videoUpload.onchange=async e=>{
+ let f=new FormData();
+ f.append("file",e.target.files[0]);
+ await fetch(API+"/upload-video",{method:"POST",body:f});
+ mostrarMensaje("🎥 Video subido");
+ cargarVideos();
+};
+
+// SUBIR IMAGEN
+imageUpload.onchange=async e=>{
+ let f=new FormData();
+ f.append("file",e.target.files[0]);
+ await fetch(API+"/upload-image",{method:"POST",body:f});
+ mostrarMensaje("📸 Imagen subida");
+};
+
+// CONFIRMAR
+async function confirmar(){
+ await fetch(API+"/confirmar",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({
+    nombre:nombre.value,
+    correo:correo.value
+  })
+ });
+ mostrarMensaje("💜 Confirmado");
+}
+
+// MENSAJE
 async function enviarMensaje(){
  await fetch(API+"/mensaje",{
   method:"POST",
@@ -161,6 +199,21 @@ async function enviarMensaje(){
  });
  mostrarMensaje("💌 Mensaje enviado");
 }
+
+// CARGAR VIDEOS
+async function cargarVideos(){
+ let r=await fetch(API+"/videos");
+ let data=await r.json();
+ videos.innerHTML="";
+ data.forEach(v=>{
+  let el=document.createElement("video");
+  el.src=API+v;
+  el.controls=true;
+  videos.appendChild(el);
+ });
+}
+
+cargarVideos();
 </script>
 
 </body>

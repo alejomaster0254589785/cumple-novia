@@ -13,7 +13,6 @@ body{
   font-family:'Poppins';
   background:#140a22;
   color:white;
-  overflow:hidden;
 }
 
 /* INTRO */
@@ -27,20 +26,15 @@ body{
   z-index:9999;
   animation: fadeOut 4s forwards;
 }
-.intro-text{
-  font-size:2rem;
-  animation: aparecerTexto 3s forwards;
-}
-@keyframes aparecerTexto{from{opacity:0} to{opacity:1}}
 @keyframes fadeOut{80%{opacity:1}100%{opacity:0;visibility:hidden}}
 
-/* COLLAGE GRID */
+/* COLLAGE */
 #collage{
   position:fixed;
   inset:0;
   z-index:-1;
   display:grid;
-  grid-template-columns: repeat(4,1fr);
+  grid-template-columns:repeat(4,1fr);
   gap:5px;
   padding:5px;
 }
@@ -48,11 +42,10 @@ body{
   background-size:cover;
   background-position:center;
   border-radius:10px;
-  filter: brightness(0.5);
-  transition: all 1s ease;
+  filter:brightness(0.5);
 }
 
-/* MENSAJES TIPO TIKTOK */
+/* MENSAJES */
 #mensajesPantalla{
   position:fixed;
   inset:0;
@@ -61,45 +54,46 @@ body{
 }
 .mensaje-item{
   position:absolute;
-  font-size:28px;
-  font-weight:600;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(10px);
-  padding:20px;
+  font-size:24px;
+  background:rgba(0,0,0,0.4);
+  padding:15px;
   border-radius:20px;
-  opacity:0;
-  transform:scale(0.8);
-  animation: aparecer 1s forwards, desaparecer 6s forwards;
+  animation: aparecer 1s, desaparecer 6s forwards;
 }
-@keyframes aparecer{to{opacity:1;transform:scale(1)}}
 @keyframes desaparecer{80%{opacity:1}100%{opacity:0}}
 
 /* CORAZONES */
 .heart{
   position:fixed;
   bottom:-20px;
-  font-size:20px;
-  color:#ff4d9e;
-  animation: flotar 6s linear forwards;
+  animation:flotar 6s linear;
 }
-@keyframes flotar{
-  to{
-    transform:translateY(-110vh) scale(1.5);
-    opacity:0;
-  }
+@keyframes flotar{to{transform:translateY(-110vh);opacity:0}}
+
+/* UI */
+.section{padding:20px;text-align:center;}
+.card{
+  background:rgba(255,255,255,0.08);
+  padding:20px;
+  border-radius:20px;
+  margin:10px;
 }
 
-/* HEADER */
-header{
-  position:fixed;
-  top:10px;
-  width:100%;
-  text-align:center;
-  z-index:10;
+input,textarea{
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  width:90%;
+  margin:5px;
 }
-h1{
-  font-family:'Great Vibes';
-  font-size:2.5rem;
+
+button{
+  padding:10px 20px;
+  background:#a855f7;
+  border:none;
+  border-radius:10px;
+  color:white;
+  cursor:pointer;
 }
 
 /* HISTORIAS */
@@ -117,32 +111,15 @@ h1{
   max-width:400px;
   height:80%;
   background-size:cover;
-  background-position:center;
   border-radius:20px;
 }
-#barra{
-  position:absolute;
-  top:10px;
-  left:10px;
-  right:10px;
-  height:5px;
-  background:rgba(255,255,255,0.3);
-}
-#progreso{
-  height:100%;
-  width:0%;
-  background:white;
-}
-
-/* BOTON HISTORIA */
 #btnHistoria{
   position:fixed;
   bottom:20px;
   left:20px;
   background:#a855f7;
-  padding:10px 20px;
+  padding:10px;
   border-radius:10px;
-  z-index:30;
   cursor:pointer;
 }
 </style>
@@ -150,43 +127,50 @@ h1{
 
 <body>
 
-<div id="intro">
-  <div class="intro-text">Desde el momento en que te vi… 💜</div>
-</div>
+<div id="intro">💜</div>
 
 <div id="collage"></div>
 <div id="mensajesPantalla"></div>
 
 <div id="historias">
-  <div id="barra"><div id="progreso"></div></div>
   <div class="story" id="story"></div>
 </div>
 
-<div id="btnHistoria">Ver historia 💜</div>
+<div id="btnHistoria">Ver historia</div>
 
-<header>
+<header style="text-align:center">
 <h1>Feliz Cumpleaños 💜</h1>
-<div id="contador"></div>
 </header>
 
-<audio id="musica" loop>
-  <source src="musica.mp3">
-</audio>
+<!-- SUBIR -->
+<div class="section">
+<div class="card">
+<h3>Subir recuerdos</h3>
+<input type="file" id="imageUpload">
+<input type="file" id="videoUpload">
+</div>
+</div>
+
+<!-- MENSAJE -->
+<div class="section">
+<div class="card">
+<input id="nombreMsg" placeholder="Nombre">
+<textarea id="mensaje"></textarea>
+<button onclick="enviarMensaje()">Enviar</button>
+</div>
+</div>
+
+<!-- CONFIRMAR -->
+<div class="section">
+<div class="card">
+<input id="nombre">
+<input id="correo">
+<button onclick="confirmar()">Confirmar</button>
+</div>
+</div>
 
 <script>
 const API="https://cumple-backend-lpdv.onrender.com";
-
-/* MUSICA */
-document.body.addEventListener("click",()=>{
- document.getElementById("musica").play();
-},{once:true});
-
-/* CONTADOR */
-const fecha=new Date("2026-03-30");
-setInterval(()=>{
- let d=fecha-new Date();
- contador.innerText=`Faltan ${Math.floor(d/(1000*60*60*24))} días 💜`;
-},1000);
 
 /* COLLAGE */
 let imagenes=[];
@@ -194,26 +178,17 @@ let imagenes=[];
 async function cargarCollage(){
  let r=await fetch(API+"/images");
  imagenes=await r.json();
- renderCollage();
- setInterval(actualizarRandom,3000);
+ render();
 }
 
-function renderCollage(){
+function render(){
  collage.innerHTML="";
  for(let i=0;i<8;i++){
-  let div=document.createElement("div");
-  div.className="collage-item";
-  div.style.backgroundImage=`url(${getImg()})`;
-  collage.appendChild(div);
+  let d=document.createElement("div");
+  d.className="collage-item";
+  d.style.backgroundImage=`url(${getImg()})`;
+  collage.appendChild(d);
  }
-}
-
-function actualizarRandom(){
- document.querySelectorAll(".collage-item").forEach(el=>{
-  if(Math.random()<0.3){
-    el.style.backgroundImage=`url(${getImg()})`;
-  }
- });
 }
 
 function getImg(){
@@ -227,63 +202,78 @@ async function cargarMensajes(){
  let data=await r.json();
 
  data.slice(-3).forEach(m=>{
-  let div=document.createElement("div");
-  div.className="mensaje-item";
-  div.innerText=m.mensaje+" 💜";
-
-  div.style.top=Math.random()*70+"%";
-  div.style.left=Math.random()*70+"%";
-
-  mensajesPantalla.appendChild(div);
-  setTimeout(()=>div.remove(),6000);
+  let d=document.createElement("div");
+  d.className="mensaje-item";
+  d.innerText=m.mensaje;
+  d.style.top=Math.random()*80+"%";
+  d.style.left=Math.random()*80+"%";
+  mensajesPantalla.appendChild(d);
+  setTimeout(()=>d.remove(),6000);
  });
 }
 setInterval(cargarMensajes,8000);
 
 /* CORAZONES */
-function crearCorazon(){
+setInterval(()=>{
  let h=document.createElement("div");
  h.className="heart";
  h.innerText="💜";
  h.style.left=Math.random()*100+"%";
- h.style.fontSize=(15+Math.random()*20)+"px";
  document.body.appendChild(h);
  setTimeout(()=>h.remove(),6000);
-}
-setInterval(crearCorazon,500);
+},500);
 
-/* HISTORIAS */
-let index=0;
-
-btnHistoria.onclick=()=>{
- historias.style.display="flex";
- mostrarStory();
+/* UPLOAD */
+imageUpload.onchange=async e=>{
+ let f=new FormData();
+ f.append("file",e.target.files[0]);
+ await fetch(API+"/upload-image",{method:"POST",body:f});
+ cargarCollage();
 };
 
-function mostrarStory(){
- if(imagenes.length===0)return;
+videoUpload.onchange=async e=>{
+ let f=new FormData();
+ f.append("file",e.target.files[0]);
+ await fetch(API+"/upload-video",{method:"POST",body:f});
+};
 
- story.style.backgroundImage=`url(${getImg()})`;
-
- progreso.style.width="0%";
- let i=0;
-
- let intervalo=setInterval(()=>{
-  i+=5;
-  progreso.style.width=i+"%";
-
-  if(i>=100){
-    clearInterval(intervalo);
-    index++;
-    mostrarStory();
-  }
- },200);
+/* MENSAJE */
+async function enviarMensaje(){
+ await fetch(API+"/mensaje",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({
+    nombre:nombreMsg.value,
+    mensaje:mensaje.value
+  })
+ });
 }
+
+/* CONFIRMAR */
+async function confirmar(){
+ await fetch(API+"/confirmar",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({
+    nombre:nombre.value,
+    correo:correo.value
+  })
+ });
+}
+
+/* HISTORIAS */
+btnHistoria.onclick=()=>{
+ historias.style.display="flex";
+ story.style.backgroundImage=`url(${getImg()})`;
+};
 
 /* INIT */
 cargarCollage();
 cargarMensajes();
 </script>
+
+</body>
+</html>
 
 </body>
 </html>

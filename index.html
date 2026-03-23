@@ -45,48 +45,39 @@ body{
   filter:brightness(0.5);
 }
 
-/* MENSAJES */
-#mensajesPantalla{
-  position:fixed;
-  inset:0;
-  z-index:20;
-  pointer-events:none;
+/* HEADER */
+header{
+  text-align:center;
+  padding:40px 20px;
 }
-.mensaje-item{
-  position:absolute;
-  font-size:24px;
-  background:rgba(0,0,0,0.4);
-  padding:15px;
-  border-radius:20px;
-  animation: aparecer 1s, desaparecer 6s forwards;
+h1{
+  font-family:'Great Vibes';
+  font-size:3rem;
 }
-@keyframes desaparecer{80%{opacity:1}100%{opacity:0}}
 
-/* CORAZONES */
-.heart{
-  position:fixed;
-  bottom:-20px;
-  animation:flotar 6s linear;
+/* SECCIONES */
+.section{
+  padding:20px;
+  text-align:center;
 }
-@keyframes flotar{to{transform:translateY(-110vh);opacity:0}}
-
-/* UI */
-.section{padding:20px;text-align:center;}
 .card{
   background:rgba(255,255,255,0.08);
   padding:20px;
   border-radius:20px;
-  margin:10px;
+  margin:10px auto;
+  max-width:400px;
 }
 
+/* INPUTS */
 input,textarea{
+  width:90%;
   padding:10px;
   border-radius:10px;
   border:none;
-  width:90%;
   margin:5px;
 }
 
+/* BOTONES */
 button{
   padding:10px 20px;
   background:#a855f7;
@@ -96,15 +87,50 @@ button{
   cursor:pointer;
 }
 
+/* VIDEOS */
+#videos video{
+  width:100%;
+  max-width:300px;
+  margin:10px;
+  border-radius:10px;
+}
+
+/* MENSAJES TIPO TIKTOK */
+#mensajesPantalla{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:20;
+}
+.mensaje-item{
+  position:absolute;
+  background:rgba(0,0,0,0.4);
+  padding:20px;
+  border-radius:20px;
+  font-size:22px;
+  animation:fade 6s forwards;
+}
+@keyframes fade{80%{opacity:1}100%{opacity:0}}
+
+/* CORAZONES */
+.heart{
+  position:fixed;
+  bottom:-20px;
+  animation:flotar 6s linear;
+}
+@keyframes flotar{
+  to{transform:translateY(-110vh);opacity:0}
+}
+
 /* HISTORIAS */
 #historias{
   position:fixed;
   inset:0;
   background:black;
   display:none;
+  z-index:50;
   justify-content:center;
   align-items:center;
-  z-index:50;
 }
 .story{
   width:90%;
@@ -113,14 +139,30 @@ button{
   background-size:cover;
   border-radius:20px;
 }
-#btnHistoria{
+#barra{
+  position:absolute;
+  top:10px;
+  left:10px;
+  right:10px;
+  height:5px;
+  background:rgba(255,255,255,0.3);
+}
+#progreso{
+  height:100%;
+  width:0%;
+  background:white;
+}
+
+/* FINAL */
+#final{
+  display:none;
   position:fixed;
-  bottom:20px;
-  left:20px;
-  background:#a855f7;
-  padding:10px;
-  border-radius:10px;
-  cursor:pointer;
+  inset:0;
+  background:black;
+  z-index:100;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
 }
 </style>
 </head>
@@ -132,14 +174,17 @@ button{
 <div id="collage"></div>
 <div id="mensajesPantalla"></div>
 
+<!-- HISTORIAS -->
 <div id="historias">
+  <div id="barra"><div id="progreso"></div></div>
   <div class="story" id="story"></div>
 </div>
 
-<div id="btnHistoria">Ver historia</div>
-
-<header style="text-align:center">
+<!-- HEADER -->
+<header>
 <h1>Feliz Cumpleaños 💜</h1>
+<div id="contador"></div>
+<button onclick="abrirHistorias()">Ver historia 💜</button>
 </header>
 
 <!-- SUBIR -->
@@ -154,7 +199,8 @@ button{
 <!-- MENSAJE -->
 <div class="section">
 <div class="card">
-<input id="nombreMsg" placeholder="Nombre">
+<h3>💌 Mensaje</h3>
+<input id="nombreMsg" placeholder="Tu nombre">
 <textarea id="mensaje"></textarea>
 <button onclick="enviarMensaje()">Enviar</button>
 </div>
@@ -163,24 +209,45 @@ button{
 <!-- CONFIRMAR -->
 <div class="section">
 <div class="card">
+<h3>📩 Confirmar asistencia</h3>
 <input id="nombre">
 <input id="correo">
 <button onclick="confirmar()">Confirmar</button>
 </div>
 </div>
 
+<!-- VIDEOS -->
+<div class="section">
+<div class="card">
+<h3>🎥 Videos</h3>
+<div id="videos"></div>
+</div>
+</div>
+
+<!-- FINAL -->
+<div id="final">
+<h1 style="font-family:'Great Vibes';font-size:3rem;">
+Eres el amor de mi vida 💜
+</h1>
+</div>
+
 <script>
 const API="https://cumple-backend-lpdv.onrender.com";
 
+/* CONTADOR */
+const fecha=new Date("2026-03-30");
+setInterval(()=>{
+ let d=fecha-new Date();
+ contador.innerText="Faltan "+Math.floor(d/(1000*60*60*24))+" días 💜";
+},1000);
+
 /* COLLAGE */
 let imagenes=[];
-
 async function cargarCollage(){
  let r=await fetch(API+"/images");
  imagenes=await r.json();
  render();
 }
-
 function render(){
  collage.innerHTML="";
  for(let i=0;i<8;i++){
@@ -190,8 +257,8 @@ function render(){
   collage.appendChild(d);
  }
 }
-
 function getImg(){
+ if(imagenes.length==0)return "";
  let img=imagenes[Math.floor(Math.random()*imagenes.length)];
  return img.startsWith("http")?img:API+img;
 }
@@ -200,11 +267,10 @@ function getImg(){
 async function cargarMensajes(){
  let r=await fetch(API+"/mensajes");
  let data=await r.json();
-
  data.slice(-3).forEach(m=>{
   let d=document.createElement("div");
   d.className="mensaje-item";
-  d.innerText=m.mensaje;
+  d.innerText=m.mensaje+" 💜";
   d.style.top=Math.random()*80+"%";
   d.style.left=Math.random()*80+"%";
   mensajesPantalla.appendChild(d);
@@ -235,7 +301,21 @@ videoUpload.onchange=async e=>{
  let f=new FormData();
  f.append("file",e.target.files[0]);
  await fetch(API+"/upload-video",{method:"POST",body:f});
+ cargarVideos();
 };
+
+/* VIDEOS */
+async function cargarVideos(){
+ let r=await fetch(API+"/videos");
+ let data=await r.json();
+ videos.innerHTML="";
+ data.forEach(v=>{
+  let el=document.createElement("video");
+  el.src=API+v;
+  el.controls=true;
+  videos.appendChild(el);
+ });
+}
 
 /* MENSAJE */
 async function enviarMensaje(){
@@ -262,14 +342,43 @@ async function confirmar(){
 }
 
 /* HISTORIAS */
-btnHistoria.onclick=()=>{
+let historiaIndex=0;
+let historiasData=[];
+async function abrirHistorias(){
  historias.style.display="flex";
+ let r=await fetch(API+"/images");
+ historiasData=await r.json();
+ historiaIndex=0;
+ nextStory();
+}
+function nextStory(){
+ if(historiaIndex>=historiasData.length){
+  historias.style.display="none";
+  return;
+ }
  story.style.backgroundImage=`url(${getImg()})`;
-};
+ progreso.style.width="0%";
+ let i=0;
+ let inter=setInterval(()=>{
+  i+=2;
+  progreso.style.width=i+"%";
+  if(i>=100){
+    clearInterval(inter);
+    historiaIndex++;
+    nextStory();
+  }
+ },100);
+}
+
+/* FINAL */
+setTimeout(()=>{
+ document.getElementById("final").style.display="flex";
+},60000);
 
 /* INIT */
 cargarCollage();
 cargarMensajes();
+cargarVideos();
 </script>
 
 </body>
